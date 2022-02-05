@@ -1,6 +1,10 @@
 #pragma once
 
 #include <bn/header.hpp>
+#include <bn/type.hpp>
+#include <bn/error.hpp>
+#include <bn/command.hpp>
+#include <bn/servercommand.hpp>
 
 namespace bn {
 
@@ -13,17 +17,18 @@ protected:
     AppOption mOpt;
     int mArgc;
     char **mArgv;
-    int mOptind;
+    std::string mCmdName;
 
 public:
     ~App();
     App(int argc, char *argv[]);
-    bool run();
+    int run();
 
 protected:
     void showUsage();
-    bool parseOpts();
-    bool _run();
+    int _run();
+    int runCmd(const std::string &cmdName);
+    CommandPtr makeCmd(const std::string &cmdName);
 };
 
 };  // nc

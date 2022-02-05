@@ -46,3 +46,4 @@
 #include <list>
 #include <sstream>
 #include <fstream>
+#include <memory>

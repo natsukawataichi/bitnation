@@ -11,7 +11,9 @@ endif
 CC := g++
 OBJS := \
 	build$(SEP)bn$(SEP)app.o \
+	build$(SEP)bn$(SEP)error.o \
 	build$(SEP)bn$(SEP)socket.o \
+	build$(SEP)bn$(SEP)servercommand.o \
 
 PROG := bitnation
 RMDIR := rmdir /s /q
@@ -50,5 +52,12 @@ build$(SEP)bn$(SEP)main.o: bn$(SEP)main.cpp bn$(SEP)main.hpp
 build$(SEP)bn$(SEP)app.o: bn$(SEP)app.cpp bn$(SEP)app.hpp
 	$(CC) $(CC_FLAGS) -c $< -o $@ $(CC_LIBS)
 
+build$(SEP)bn$(SEP)error.o: bn$(SEP)error.cpp bn$(SEP)error.hpp
+	$(CC) $(CC_FLAGS) -c $< -o $@ $(CC_LIBS)
+
 build$(SEP)bn$(SEP)socket.o: bn$(SEP)socket.cpp bn$(SEP)socket.hpp
 	$(CC) $(CC_FLAGS) -c $< -o $@ $(CC_LIBS)
+
+build$(SEP)bn$(SEP)servercommand.o: bn$(SEP)servercommand.cpp bn$(SEP)servercommand.hpp
+	$(CC) $(CC_FLAGS) -c $< -o $@ $(CC_LIBS)
+

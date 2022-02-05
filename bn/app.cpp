@@ -6,18 +6,10 @@ App::~App() {
 }
 
 App::App(int argc, char *argv[])
-    : mArgc(argc)
+    : mOpt()
+    , mArgc(argc)
     , mArgv(argv)
 {}
-
-bool
-App::run() {
-    if (!parseOpts()) {
-        return false;
-    }
-
-    return _run();
-}
 
 void 
 App::showUsage() {
@@ -33,54 +25,46 @@ App::showUsage() {
     std::cout << std::endl;
 }
 
-bool 
-App::_run() {
-    if (mOpt.isHelp) {
-        showUsage();
-        return true;
-    }
-
-    return true;
+int
+App::run() {
+    return _run();
 }
 
-bool 
-App::parseOpts() {
-    // parse options
-    static struct option longopts[] = {
-        {"help", no_argument, 0, 'h'},
-        {"fname", required_argument, 0, 'f'},
-        {0},
-    };
-
-    opterr = 0; // ignore error messages
-    optind = 0; // init index of parse
-
-    for (;;) {
-        int optsindex;
-        int cur = getopt_long(
-            mArgc, mArgv, "hf:", longopts, &optsindex
-        );
-        if (cur == -1) {
-            break;
-        }
-
-        switch (cur) {
-        case 0: /* long option only */ break;
-        case 'h': mOpt.isHelp = true; break;
-        case 'f': printf("%s\n", optarg); break;
-        case '?':
-        default: perror("Unknown option"); break;
-        }
+int 
+App::_run() {
+    bool needUsage = mOpt.isHelp || mArgc < 2;
+    if (needUsage) {
+        showUsage();
+        return 0;
     }
 
-    mOptind = optind;
-    
-    if (mArgc < optind) {
-        perror("Failed to parse option");
-        return false;
+    const char *cmdName = mArgv[1];
+    return runCmd(cmdName);
+}
+
+int
+App::runCmd(const std::string &cmdName) {
+    mCmdName = cmdName;
+
+    auto cmd = makeCmd(mCmdName);
+    if (!cmd) {
+        error("invalid command name \"%s\"", mCmdName.c_str());
+        return 1;
     }
 
-    return true;
+    return cmd->run();
+}
+
+CommandPtr 
+App::makeCmd(const std::string &cmdName) {
+    int cmdArgc = mArgc - 1;
+    char **cmdArgv = mArgv + 1;
+
+    if (cmdName == "server") {
+        return std::make_shared<ServerCommand>(cmdArgc, cmdArgv);
+    }
+
+    return nullptr;
 }
 
 };  // bn
